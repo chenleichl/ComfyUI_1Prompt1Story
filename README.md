@@ -1,0 +1,2 @@
+# ComfyUI_1Prompt1Story
+1Prompt1Story的comfyui版本，train-free框架下，一句prompt生成连续的故事图片
