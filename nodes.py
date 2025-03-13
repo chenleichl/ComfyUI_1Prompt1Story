@@ -3,7 +3,7 @@ import torch
 import random
 import diffusers
 import torch.utils
-import .unet.utils as utils
+from .unet import utils
 from .unet.unet_controller import UNetController
 import numpy as np
 import folder_paths
