@@ -1,0 +1,14 @@
+[project]
+name = "1prompt1story"
+description = "ComfyUI nodes to use [a/1Prompt1Story](https://github.com/byliutao/1Prompt1Story)"
+version = "1.0.0"
+license = {file = "LICENSE"}
+
+[project.urls]
+Repository = "https://github.com/leeguandong/ComfyUI_1Prompt1Story"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = ""
+DisplayName = "ComfyUI_1Prompt1Story"
+Icon = ""
