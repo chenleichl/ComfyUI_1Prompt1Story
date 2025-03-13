@@ -2,6 +2,7 @@
 
 https://github.com/byliutao/1Prompt1Story
 
+![image](workflow.png)
 
 ## Install
 
