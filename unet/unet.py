@@ -9,8 +9,8 @@ from diffusers.models.modeling_utils import ModelMixin
 from diffusers.configuration_utils import ConfigMixin
 from typing import Optional
 
-from unet.unet_controller import UNetController
-import unet.utils as utils
+from .unet_controller import UNetController
+from . import utils
 # SDXL
 
 

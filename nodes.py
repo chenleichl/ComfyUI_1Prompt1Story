@@ -74,6 +74,7 @@ class GenerateStoryImage:
     CATEGORY = "StoryGeneration"
 
     def generate_story(self, story_model, id_prompt, frame_prompts, seed, window_length,save_dir):
+        # 执行生成逻辑
         # 参数解析
         frame_prompt_list = [p.strip() for p in frame_prompts.split('\n') if p.strip()]
         if not frame_prompt_list:
@@ -88,7 +89,6 @@ class GenerateStoryImage:
             save_dir = os.path.join(folder_paths.get_output_directory(), f"story_{current_time}")
         os.makedirs(save_dir, exist_ok=True)
 
-        # 执行生成逻辑
         images, _ = utils.movement_gen_story_slide_windows(
             id_prompt,
             frame_prompt_list,
@@ -98,25 +98,26 @@ class GenerateStoryImage:
             story_model["controller"],
             save_dir
         )
-
-        # 转换图像格式为ComfyUI标准格式
+                                        
+        # 转换图像格式为ComfyUI标准格式            
         tensor_images = torch.cat([self.image_to_tensor(img) for img in images], dim=0)
-        return (tensor_images,)
-
-    def image_to_tensor(self, img):
-        img = img.convert("RGB")
+        return (tensor_images,)         
+                                        
+    def image_to_tensor(self, img):     
+        img = img.convert("RGB")        
         img = np.array(img).astype(np.float32) / 255.0
         img = torch.from_numpy(img)[None,]
-        return img
-
-
-# 节点注册
-NODE_CLASS_MAPPINGS = {
+        return img                      
+                                        
+                                        
+# 节点注册                                  
+NODE_CLASS_MAPPINGS = {                 
     "PromptStoryModelLoader": PromptStoryModelLoader,
     "GenerateStoryImage": GenerateStoryImage
-}
-
-NODE_DISPLAY_NAME_MAPPINGS = {
+}                                       
+                                        
+NODE_DISPLAY_NAME_MAPPINGS = {          
     "PromptStoryModelLoader": "PromptStoryModelLoader",
     "GenerateStoryImage": "GenerateStoryImage"
-}
+}                                       
+                                        

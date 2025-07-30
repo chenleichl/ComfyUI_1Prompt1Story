@@ -58,8 +58,8 @@ from diffusers.pipelines.pipeline_utils import DiffusionPipeline, StableDiffusio
 from diffusers.pipelines.stable_diffusion_xl.pipeline_output import StableDiffusionXLPipelineOutput
 
 
-from unet.unet_controller import UNetController
-import unet.utils as utils 
+from .unet_controller import UNetController
+from . import utils 
 
 if is_invisible_watermark_available():
     from diffusers.pipelines.stable_diffusion_xl.watermark import StableDiffusionXLWatermarker
@@ -885,7 +885,7 @@ class StableDiffusionXLPipeline(
         prompt_2: Optional[Union[str, List[str]]] = None,
         height: Optional[int] = None,
         width: Optional[int] = None,
-        num_inference_steps: int = 50,
+        num_inference_steps: int = 20,
         timesteps: List[int] = None,
         denoising_end: Optional[float] = None,
         guidance_scale: float = 5.0,
@@ -1243,14 +1243,17 @@ class StableDiffusionXLPipeline(
 
         # 9. Optionally get Guidance Scale Embedding
         timestep_cond = None
+        
         if self.unet.config.time_cond_proj_dim is not None:
+            print("here")
             guidance_scale_tensor = torch.tensor(self.guidance_scale - 1).repeat(batch_size * num_images_per_prompt)
             timestep_cond = self.get_guidance_scale_embedding(
                 guidance_scale_tensor, embedding_dim=self.unet.config.time_cond_proj_dim
             ).to(device=device, dtype=latents.dtype)
 
         self._num_timesteps = len(timesteps)
-
+        print(f"batch_size: {batch_size}, num_images_per_prompt: {num_images_per_prompt}, num_inference_steps: {num_inference_steps}")
+        
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
                 if self.interrupt:

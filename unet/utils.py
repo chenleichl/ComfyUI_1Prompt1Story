@@ -9,12 +9,12 @@ from transformers import (
 )
 from scipy.spatial.distance import cdist
 import numpy as np
-import unet.pipeline_stable_diffusion_xl as pipeline_stable_diffusion_xl
+from . import pipeline_stable_diffusion_xl
 from torch.fft import fftn, fftshift, ifftn, ifftshift
 from typing import Optional, Tuple
 
-from unet.unet import UNet2DConditionModel
-from unet.unet_controller import UNetController
+from .unet import UNet2DConditionModel
+from .unet_controller import UNetController
 
 
 def ipca(q, k, v, scale, unet_controller: Optional[UNetController] = None): # eg. q: [4,20,1024,64] k,v: [4,20,77,64] 
@@ -203,7 +203,9 @@ def load_pipe_from_path(model_path, device, torch_dtype, variant):
     
     if model_path.split('/')[-1] == 'Juggernaut-X-v10' or model_path.split('/')[-1] == 'Juggernaut-XI-v11':
         variant = None
+    import os
 
+    print("model_path", os.path.abspath(model_path))
     vae = AutoencoderKL.from_pretrained(model_path, subfolder="vae", torch_dtype=torch_dtype, variant=variant,)
     tokenizer = CLIPTokenizer.from_pretrained(model_path, subfolder="tokenizer", torch_dtype=torch_dtype, variant=variant,)
     tokenizer_2 = CLIPTokenizer.from_pretrained(model_path, subfolder="tokenizer_2", torch_dtype=torch_dtype, variant=variant,)
@@ -253,6 +255,12 @@ def movement_gen_story_slide_windows(id_prompt, frame_prompt_list, pipe, window_
     generate = torch.Generator().manual_seed(seed)
     unet_controller.id_prompt = id_prompt
 
+    try:
+        #bugfix for gpu oom in 4070
+        pipe("", generator=generate, unet_controller=unet_controller, num_inference_steps=1)
+    except Exception as e:
+        print(f"skip frame oom warning: {e}")
+
     for index, movement in enumerate(frame_prompt_list):
         if unet_controller is not None:
             if window_length < len(frame_prompt_list):
@@ -270,15 +278,12 @@ def movement_gen_story_slide_windows(id_prompt, frame_prompt_list, pipe, window_
                 print(f"express: {unet_controller.frame_prompt_express}")
                 print(f'id_prompt: {id_prompt}')
                 print(f"gen_propmts: {gen_propmts}")
-
-
         else:
             gen_propmts = f'{id_prompt} {movement}'
 
         if unet_controller is not None and unet_controller.Use_same_init_noise is True:     
             generate = torch.Generator().manual_seed(seed)
-
-        images = pipe(gen_propmts, generator=generate, unet_controller=unet_controller).images
+        images = pipe(gen_propmts, generator=generate, unet_controller=unet_controller, num_inference_steps=20).images
         story_images.append(images[0])
         images[0].save(os.path.join(save_dir, f'{id_prompt} {unet_controller.frame_prompt_express}.jpg'))
 
