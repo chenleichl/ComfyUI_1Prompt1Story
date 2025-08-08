@@ -12,6 +12,7 @@ import numpy as np
 from . import pipeline_stable_diffusion_xl
 from torch.fft import fftn, fftshift, ifftn, ifftshift
 from typing import Optional, Tuple
+import uuid
 
 from .unet import UNet2DConditionModel
 from .unet_controller import UNetController
@@ -285,7 +286,8 @@ def movement_gen_story_slide_windows(id_prompt, frame_prompt_list, pipe, window_
             generate = torch.Generator().manual_seed(seed)
         images = pipe(gen_propmts, generator=generate, unet_controller=unet_controller, num_inference_steps=20).images
         story_images.append(images[0])
-        images[0].save(os.path.join(save_dir, f'{id_prompt} {unet_controller.frame_prompt_express}.jpg'))
+        uuid_filename = str(uuid.uuid4())
+        images[0].save(os.path.join(save_dir, f'{id_prompt}_{uuid_filename}.jpg'))
 
 
     image_array_list = [np.array(pil_img) for pil_img in story_images]
