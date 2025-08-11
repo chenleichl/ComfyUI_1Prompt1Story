@@ -89,15 +89,21 @@ class GenerateStoryImage:
             save_dir = os.path.join(folder_paths.get_output_directory(), f"story_{current_time}")
         os.makedirs(save_dir, exist_ok=True)
 
-        images, _ = utils.movement_gen_story_slide_windows(
-            id_prompt,
-            frame_prompt_list,
-            story_model["pipe"],
-            window_length,
-            seed,
-            story_model["controller"],
-            save_dir
-        )
+        for i in range(2):
+            try:
+                images, _ = utils.movement_gen_story_slide_windows(
+                    id_prompt,
+                    frame_prompt_list,
+                    story_model["pipe"],
+                    window_length,
+                    seed,
+                    story_model["controller"],
+                    save_dir
+                )
+            except Exception as e:
+                print(f"error: {e}")
+                continue
+            break
                                         
         # 转换图像格式为ComfyUI标准格式            
         tensor_images = torch.cat([self.image_to_tensor(img) for img in images], dim=0)
